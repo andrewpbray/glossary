@@ -2,25 +2,14 @@ local options_class = nil
 quarto.log.output("=== Class Name ===")
 
 
--- options include:
+-- permitted options include:
 -- glossary:
 --   class: none | class
-local function read_meta(meta)
+function Meta(meta)
   local options = meta["glossary"]
-  if options ~= nil then
-    if options.class ~= nil then
-      options_class = options.class
-      quarto.log.output(meta)
-    end
+  if options.class ~= nil then
+      options_class = options.class[1].text
   end
-end
-
-local function isDef(class)
-  return class == "def"
-end
-
-local function isClass(class)
-  return class == options_class
 end
 
 function Pandoc(el)
@@ -29,10 +18,17 @@ function Pandoc(el)
   local file_contents = pandoc.read(io.open(filepath):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
   local filtered_blocks = {}
   for _, block in ipairs(file_contents) do
-    if (block.t == "Div" and block.attr.classes:find_if(isDef))  then
+    if (block.t == "Div" and block.classes:includes(options_class))  then
       table.insert(filtered_blocks, block)  -- Add the block to the filtered table
     end
   end
   el.blocks:extend(filtered_blocks)
   return el
 end
+
+
+function replace_with_glossary(div)
+
+return{
+  Div = replace_with_glossary
+}
