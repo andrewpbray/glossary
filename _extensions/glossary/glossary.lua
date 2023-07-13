@@ -1,4 +1,6 @@
 local options_class = "def"
+local options_contents = nil
+
 quarto.log.output("=== Preamble ===")
 
 -- permitted options include:
@@ -15,11 +17,14 @@ local function read_meta(meta)
       options_id = options.id[1].text
       quarto.log.output("Selected id is: ", options_id)
   end
+    if options.contents ~= nil then
+      options_contents = options.contents[1][1].text
+      quarto.log.output("Selected contents are: ", options_contents)
+  end
 end
 
 -- Build list of filepaths to scan through
 local current_dir = pandoc.path.directory(PANDOC_SCRIPT_FILE)
-local filepath = current_dir .. "/" .. "notes.qmd"
 
 -- Open files as blocks
 
@@ -31,8 +36,10 @@ function insert_glossary(div)
   
 -- find a div it likes
   if (div.identifier == options_id) then
-  -- read in files
-  local file_contents = pandoc.read(io.open(filepath):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
+    -- read in files
+    local filepath = current_dir .. "/" .. options_contents
+    quarto.log.output("The filepath is", filepath)
+    local file_contents = pandoc.read(io.open(filepath):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
 
     for _, block in ipairs(file_contents) do
       local has_class = false
