@@ -5,7 +5,11 @@ quarto.log.output("=== Preamble ===")
 
 -- permitted options include:
 -- glossary:
+--   id: string
 --   class: none | class
+--   contents:
+--     - "first-file.qmd"
+--     - "second-file.qmd"
 local function read_meta(meta)
   quarto.log.output("Reading meta . . .")
   local options = meta["glossary"]
@@ -18,8 +22,9 @@ local function read_meta(meta)
       quarto.log.output("Selected id is: ", options_id)
   end
     if options.contents ~= nil then
-      options_contents = options.contents[1][1].text
-      quarto.log.output("Selected contents are: ", options_contents)
+      --options_contents = options.contents[1][1].text
+      options_contents = options.contents
+      quarto.log.output("Selected contents are: ", options.contents)
   end
 end
 
@@ -34,27 +39,28 @@ function insert_glossary(div)
   quarto.log.output(div.identifier == options_id)
   local filtered_blocks = {}
   
--- find a div it likes
+  -- find a div it likes
   if (div.identifier == options_id) then
     -- read in files
-    local filepath = current_dir .. "/" .. options_contents
-    quarto.log.output("The filepath is", filepath)
-    local file_contents = pandoc.read(io.open(filepath):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
-
-    for _, block in ipairs(file_contents) do
-      local has_class = false
-      if (block.classes ~= nil) then
-        has_class = block.classes:includes(options_class)
-      end
-      if (block.t == "Div" and has_class) then
-        table.insert(filtered_blocks, block)  -- Add the block to the filtered table
+    for _,filename in ipairs(options_contents) do
+      quarto.log.output("the first filename is: ", filename[1].text)
+      local filepath = current_dir .. "/" .. filename[1].text
+      quarto.log.output("The filepath is", filepath)
+      local file_contents = pandoc.read(io.open(filepath):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
+      --read in contents of files
+      for _, block in ipairs(file_contents) do
+        local has_class = false
+        if (block.classes ~= nil) then
+          has_class = block.classes:includes(options_class)
+        end
+        if (block.t == "Div" and has_class) then
+          table.insert(filtered_blocks, block)  -- Add the block to the filtered table
+        end
       end
     end
     return filtered_blocks
   end
 end
-
-quarto.log.output("=== Walking the AST ===")
 
 return{
   {Meta = read_meta},
