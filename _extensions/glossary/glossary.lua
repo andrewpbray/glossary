@@ -31,7 +31,7 @@ local function read_meta(meta)
     for g = 1,#options.contents do
       glob = options.contents[g][1].text
       if string.sub(glob, 1, 1) ~= "!" then -- add these files
-        for f in io.popen("find . -type f -not -path '*/.*'"):lines() do
+        for f in io.popen("find . -type f \\( -name '*.qmd' -o -name '*.md' -o -name '*.ipynb' \\) -not \\( -path '*/.*' -o -path '*/_*' \\) -not \\( -name 'README.md' -o -name 'README.qmd' \\)"):lines() do
           quarto.log.output("File path: ", f)
           -- for full ignore use:
           -- find . -type f \( -not \( -path '*/.*' -o -path '*/_*' \) -o -name 'README.qmd' -o -name 'README.md' \) -prune -o -print
