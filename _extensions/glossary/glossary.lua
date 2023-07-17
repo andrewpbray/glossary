@@ -13,51 +13,104 @@ quarto.log.output("=== Preamble ===")
 local function read_meta(meta)
   quarto.log.output("Reading meta . . .")
   local options = meta["glossary"]
+  
   if options.class ~= nil then
       options_class = options.class[1].text
-      quarto.log.output("Selected Class is: ", options_class)
+      quarto.log.output("Selected class is: ", options_class)
   end
+  
   if options.id ~= nil then
       options_id = options.id[1].text
       quarto.log.output("Selected id is: ", options_id)
   end
-    if options.contents ~= nil then
-      options_contents_as_inlines = options.contents
-      quarto.log.output("Selected contents are: ", options.contents)
-      options_contents = {}
-      --string_match = {}
-      for _,filename in ipairs(options_contents_as_inlines) do
-        options_contents[#options_contents + 1] = filename[1].text
-      --  string_match[#string_match + 1] = string.match(filename[1].text, globtopattern("*2.qmd"))      
+  
+  if options.contents ~= nil then
+    files_added = {}
+    files_to_scan = {}
+    
+    for g = 1,#options.contents do
+      glob = options.contents[g][1].text
+      if string.sub(glob, 1, 1) ~= "!" then -- add these files
+        for f in io.popen("find . -type f -not -path '*/.*'"):lines() do
+          -- for full ignore use:
+          -- find . -type f \( -not \( -path '*/.*' -o -path '*/_*' \) -o -name 'README.qmd' -o -name 'README.md' \) -prune -o -print
+          glob_match = string.match(f, globtopattern(glob))
+          if glob_match ~=nil and new_file(files_added, glob_match) then
+            files_added[#files_added + 1] = glob_match
+          end
+        end
+      else -- remove these files
+        ignored_glob = string.sub(glob, 2)
+        for i = 1,#files_added do
+          if (string.match(files_added[i], globtopattern(ignored_glob)) == nil) then
+            files_to_scan[#files_to_scan + 1] = files_added[i]
+          end
+        end
       end
-      quarto.log.output("Selected filepaths are: ", options_contents)
-      f_list = {}
-      for dir in io.popen("find . -type f -not -path '*/.*'"):lines() do
-        f_list[#f_list + 1] = string.match(dir, globtopattern("*.qmd"))
-      end
-      quarto.log.output("here are the files that were matched to the glob: ", f_list)
+    end
+    
+    if #files_to_scan == 0 then
+      files_to_scan = files_added
+    end
+
+    quarto.log.output("Files to be scanned: ", files_to_scan)
   end
+  
 end
 
+function new_file(list, element)
+  out = true
+  for i = 1, #list do
+    if list[i] == element then
+      out = false
+      break 
+    end
+  end
+  return out
+end
+
+    -- f_list = {}
+    -- for f in file_list do -- for every file
+    --   quarto.log.output("The f is:", f)
+    --  for g = 1, #options.contents do -- for every glob
+    --    quarto.log.output("glob is: ", options.contents[g][1].text)
+    --    f_list[#f_list + 1] = string.match(f, globtopattern(options.contents[g][1].text))
+    --  end
+    --end
+
+
+      
+    --local function remove_duplicates(list)
+    --    local res = {}
+    --    local hash = {}
+        
+    --    for _,v in ipairs(list) do
+    --      if (not hash[v]) then
+    --        res[#res+1] = v
+    --        hash[v] = true
+    --      end
+    --    end
+        
+    --    return res
+    --  end
+
+    --  f_list = remove_duplicates(f_list)
+
+
 -- Build list of filepaths to scan through
-local current_dir = pandoc.path.directory(PANDOC_SCRIPT_FILE)
+--local current_dir = pandoc.path.directory(PANDOC_SCRIPT_FILE)
 
 -- Open files as blocks
 
 function insert_glossary(div)
   
-  quarto.log.output("Inserting glossary . . .")
-  quarto.log.output(div.identifier == options_id)
   local filtered_blocks = {}
   
   -- find a div it likes
   if (div.identifier == options_id) then
     -- read in files
-    for _,filename in ipairs(options_contents) do
-      quarto.log.output("the current filename is: ", filename)
-      local filepath = current_dir .. "/" .. filename
-      quarto.log.output("The filepath is", filepath)
-      local file_contents = pandoc.read(io.open(filepath):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
+    for _,filename in ipairs(files_to_scan) do
+      local file_contents = pandoc.read(io.open(filename):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
       --read in contents of files
       for _, block in ipairs(file_contents) do
         local has_class = false
