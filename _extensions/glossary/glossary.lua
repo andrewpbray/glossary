@@ -32,9 +32,6 @@ local function read_meta(meta)
       glob = options.contents[g][1].text
       if string.sub(glob, 1, 1) ~= "!" then -- add these files
         for f in io.popen("find . -type f \\( -name '*.qmd' -o -name '*.md' -o -name '*.ipynb' \\) -not \\( -path '*/.*' -o -path '*/_*' \\) -not \\( -name 'README.md' -o -name 'README.qmd' \\)"):lines() do
-          quarto.log.output("File path: ", f)
-          -- for full ignore use:
-          -- find . -type f \( -not \( -path '*/.*' -o -path '*/_*' \) -o -name 'README.qmd' -o -name 'README.md' \) -prune -o -print
           glob_match = string.match(f, globtopattern("./" .. glob))
           if glob_match ~=nil and new_file(files_added, glob_match) then
             files_added[#files_added + 1] = glob_match
@@ -43,7 +40,7 @@ local function read_meta(meta)
       else -- remove these files
         ignored_glob = string.sub(glob, 2)
         for i = 1,#files_added do
-          if (string.match(files_added[i], globtopattern(ignored_glob)) == nil) then
+          if (string.match(files_added[i], globtopattern("./" .. ignored_glob)) == nil) then
             files_to_scan[#files_to_scan + 1] = files_added[i]
           end
         end
