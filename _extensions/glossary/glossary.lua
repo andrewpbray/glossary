@@ -1,7 +1,7 @@
 local options_class = "def"
 local options_contents = nil
 
-quarto.log.output("=== Preamble ===")
+quarto.log.output("=== Output Log ===")
 
 -- permitted options include:
 -- glossary:
@@ -113,11 +113,7 @@ function insert_glossary(div)
       local file_contents = pandoc.read(io.open(filename):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
       --read in contents of files
       for _, block in ipairs(file_contents) do
-        local has_class = false
-        if (block.classes ~= nil) then
-          has_class = block.classes:includes(options_class)
-        end
-        if (block.t == "Div" and has_class) then
+        if (block.classes ~= nil and block.t == "Div" and block.classes:includes(options_class)) then
           table.insert(filtered_blocks, block)  -- Add the block to the filtered table
         end
       end
