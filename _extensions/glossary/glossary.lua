@@ -1,7 +1,7 @@
 local options_class = "def"
 local options_contents = nil
 
-quarto.log.output("=== Output Log ===")
+quarto.log.output("=== Glossary Log ===")
 
 -- permitted options include:
 -- glossary:
@@ -11,23 +11,19 @@ quarto.log.output("=== Output Log ===")
 --     - "first-file.qmd"
 --     - "second-file.qmd"
 local function read_meta(meta)
-  quarto.log.output("Reading meta . . .")
   local options = meta["glossary"]
   
   if options.class ~= nil then
       options_class = options.class[1].text
-      quarto.log.output("Selected class is: ", options_class)
   end
   
   if options.id ~= nil then
       options_id = options.id[1].text
-      quarto.log.output("Selected id is: ", options_id)
   end
   
+  files_added = {}
+  files_to_scan = {}
   if options.contents ~= nil then
-    files_added = {}
-    files_to_scan = {}
-    
     for g = 1,#options.contents do
       glob = options.contents[g][1].text
       if string.sub(glob, 1, 1) ~= "!" then -- add these files
@@ -50,10 +46,14 @@ local function read_meta(meta)
     if #files_to_scan == 0 then
       files_to_scan = files_added
     end
-
-    quarto.log.output("Files to be scanned: ", files_to_scan)
+    
+  else
+    for f in io.popen("find . -type f \\( -name '*.qmd' -o -name '*.md' -o -name '*.ipynb' \\) -not \\( -path '*/.*' -o -path '*/_*' \\) -not \\( -name 'README.md' -o -name 'README.qmd' \\)"):lines() do
+      files_to_scan[#files_to_scan + 1] = f
+    end
   end
   
+  quarto.log.output("Files to be scanned: ", files_to_scan)
 end
 
 function new_file(list, element)
