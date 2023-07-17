@@ -32,6 +32,7 @@ local function read_meta(meta)
       glob = options.contents[g][1].text
       if string.sub(glob, 1, 1) ~= "!" then -- add these files
         for f in io.popen("find . -type f -not -path '*/.*'"):lines() do
+          quarto.log.output("File path: ", f)
           -- for full ignore use:
           -- find . -type f \( -not \( -path '*/.*' -o -path '*/_*' \) -o -name 'README.qmd' -o -name 'README.md' \) -prune -o -print
           glob_match = string.match(f, globtopattern(glob))
