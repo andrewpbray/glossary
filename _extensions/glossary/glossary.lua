@@ -35,8 +35,8 @@ local function read_meta(meta)
           quarto.log.output("File path: ", f)
           -- for full ignore use:
           -- find . -type f \( -not \( -path '*/.*' -o -path '*/_*' \) -o -name 'README.qmd' -o -name 'README.md' \) -prune -o -print
-          glob_match = string.match(f, globtopattern(glob))
-          if glob_match ~=nil and new_file(files_added, "./" .. glob) then
+          glob_match = string.match(f, globtopattern("./" .. glob))
+          if glob_match ~=nil and new_file(files_added, glob_match) then
             files_added[#files_added + 1] = glob_match
           end
         end
