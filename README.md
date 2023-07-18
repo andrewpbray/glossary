@@ -67,7 +67,7 @@ This specifies that the glossary with the id of `my-glossary` will contain any b
 
 - `contents:` A list of files to scan through for blocks that meet the specified class. These can be a YAML list of full file paths (ending in `.qmd`, `.md`, or `.ipynb`) or include globs, as in the example here, to indicate multiple files (`"ex*"` matches both `ex-plants.qmd` and `ex-animals.qmd`).
 
-  Details:
+  Further details:
   
   -  Directories and files that begin with `.` and `_` will be ignored, as will files called `README.md` and `README.qmd`. So too, will any file not ending in `.qmd`, `.md`, and `.ipynb`.
   -  [Globs](https://en.wikipedia.org/wiki/Glob_(programming)) can be used to match multiple files with a single pattern. `*`, for example, is a wildcard character that can be used to match 0 or more of any character and a glob prefixed with `!` will ignore files that match the glob.
@@ -75,5 +75,5 @@ This specifies that the glossary with the id of `my-glossary` will contain any b
 
 ## Example
 
-Here is the source code for a minimal example: [example.qmd](example.qmd).
+See [example.qmd](example.qmd) for an example of a document that inserts a glossary of definitions from two other files: [ex-plants.qmd](ex-plants.qmd) and [ex-animals.qmd](ex-animals.qmd).
 
