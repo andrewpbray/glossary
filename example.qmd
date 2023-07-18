@@ -4,18 +4,13 @@ format: html
 filters:
   - glossary
 glossary:
-  id: "gloss1"
-  class: "def"
+  id: "my-glossary"
+  class: "definition"
   contents:
-    - "*.qmd"
-    - "*notes.qmd"
+    - "ex*"
 ---
-
-## My notes
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vestibulum morbi blandit cursus risus at ultrices mi tempus. Quam pellentesque nec nam aliquam. Tortor dignissim convallis aenean et tortor at risus viverra adipiscing. Est placerat in egestas erat imperdiet sed. Amet purus gravida quis blandit turpis cursus. Tortor posuere ac ut consequat semper. Nibh sed pulvinar proin gravida hendrerit. Mauris nunc congue nisi vitae. Nunc sed augue lacus viverra vitae congue eu.
 
-## My Glossary
-
-:::{#gloss1}
+:::{#my-glossary}
 :::
