@@ -1,26 +1,35 @@
+quarto.log.output("=== Glossary Log ===")
+
+
+--================--
+-- Core Functions --
+--================--
+
 local options_class = "def"
 local options_contents = nil
 
-quarto.log.output("=== Glossary Log ===")
-
--- permitted options include:
--- glossary:
---   id: string
---   class: none | class
---   contents:
---     - "first-file.qmd"
---     - "second-file.qmd"
 local function read_meta(meta)
+  -- permitted options include:
+  -- glossary:
+  --   id: string
+  --   class: string
+  --   contents:
+  --     - "first-file.qmd"
+  --     - "second-file.qmd"
+
   local options = meta["glossary"]
   
+  -- read class
   if options.class ~= nil then
       options_class = options.class[1].text
   end
   
+  -- read id
   if options.id ~= nil then
       options_id = options.id[1].text
   end
   
+  -- read contents and return list of files to scan for blocks
   files_added = {}
   files_to_scan = {}
   if options.contents ~= nil then
@@ -56,6 +65,33 @@ local function read_meta(meta)
   quarto.log.output("Files to be scanned: ", files_to_scan)
 end
 
+
+
+function insert_glossary(div)
+  
+  local filtered_blocks = {}
+  
+  -- find divs that match id
+  if (div.identifier == options_id) then
+    for _,filename in ipairs(files_to_scan) do -- read contents of files in glossary: contents
+      local file_contents = pandoc.read(io.open(filename):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
+      for _, block in ipairs(file_contents) do 
+        -- find blocks that meet conditions
+        if (block.classes ~= nil and block.t == "Div" and block.classes:includes(options_class)) then
+          table.insert(filtered_blocks, block)  -- Add the block to the filtered table
+        end
+      end
+    end
+    return filtered_blocks
+  end
+end
+
+
+--===================--
+-- Utility Functions --
+--===================--
+
+-- check if element is in list
 function new_file(list, element)
   out = true
   for i = 1, #list do
@@ -67,59 +103,8 @@ function new_file(list, element)
   return out
 end
 
-    -- f_list = {}
-    -- for f in file_list do -- for every file
-    --   quarto.log.output("The f is:", f)
-    --  for g = 1, #options.contents do -- for every glob
-    --    quarto.log.output("glob is: ", options.contents[g][1].text)
-    --    f_list[#f_list + 1] = string.match(f, globtopattern(options.contents[g][1].text))
-    --  end
-    --end
-
-
-      
-    --local function remove_duplicates(list)
-    --    local res = {}
-    --    local hash = {}
-        
-    --    for _,v in ipairs(list) do
-    --      if (not hash[v]) then
-    --        res[#res+1] = v
-    --        hash[v] = true
-    --      end
-    --    end
-        
-    --    return res
-    --  end
-
-    --  f_list = remove_duplicates(f_list)
-
-
--- Build list of filepaths to scan through
---local current_dir = pandoc.path.directory(PANDOC_SCRIPT_FILE)
-
--- Open files as blocks
-
-function insert_glossary(div)
-  
-  local filtered_blocks = {}
-  
-  -- find a div it likes
-  if (div.identifier == options_id) then
-    -- read in files
-    for _,filename in ipairs(files_to_scan) do
-      local file_contents = pandoc.read(io.open(filename):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
-      --read in contents of files
-      for _, block in ipairs(file_contents) do
-        if (block.classes ~= nil and block.t == "Div" and block.classes:includes(options_class)) then
-          table.insert(filtered_blocks, block)  -- Add the block to the filtered table
-        end
-      end
-    end
-    return filtered_blocks
-  end
-end
-
+-- convert globs to Lua patterns
+-- written by davidm: https://github.com/davidm/lua-glob-pattern
 function globtopattern(g)
   -- Some useful references:
   -- - apr_fnmatch in Apache APR.  For example,
@@ -236,7 +221,9 @@ function globtopattern(g)
 end
 
 
-
+--====================--
+-- Run Core Functions --
+--====================--
 
 return{
   {Meta = read_meta},
