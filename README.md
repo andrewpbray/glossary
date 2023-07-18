@@ -70,6 +70,7 @@ This specifies that the glossary with the id of `my-glossary` will contain any b
   Further details:
   
   -  Directories and files that begin with `.` and `_` will be ignored, as will files called `README.md` and `README.qmd`. So too, will any file not ending in `.qmd`, `.md`, and `.ipynb`.
+  -  If the `contents` key does not appear in the metadata, the filter will scan all files in the working directory that meet the above criteria.
   -  [Globs](https://en.wikipedia.org/wiki/Glob_(programming)) can be used to match multiple files with a single pattern. `*`, for example, is a wildcard character that can be used to match 0 or more of any character and a glob prefixed with `!` will ignore files that match the glob.
   - Lua has no built-in way to process globs, so this filter includes an [implementation](https://github.com/davidm/lua-glob-pattern) written by @davidm. [Globs in base Quarto](https://quarto.org/docs/reference/globs.html) are implemented in TypeScript, so the files matched by a glob in this filter may differ from the files matched by the same glob when, say, specifying the [contents for a listing](https://quarto.org/docs/websites/website-listings.html#listing-contents).
   
