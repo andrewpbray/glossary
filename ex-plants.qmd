@@ -1,0 +1,14 @@
+---
+title: "Plants"
+format: html
+---
+
+Tempus egestas sed sed risus pretium quam vulputate. Fermentum posuere urna nec tincidunt praesent semper feugiat nibh. Ullamcorper malesuada proin libero nunc consequat interdum varius. Sed tempus urna et pharetra pharetra. Erat imperdiet sed euismod nisi. Sit amet nisl purus in mollis nunc sed id. Turpis egestas sed tempus urna et pharetra pharetra massa massa.
+
+:::{.definition}
+**Sequoia**
+
+The largest trees on Earth, appearing in three species: Giant Sequoias, Coast Redwoods, and Dawn Redwoods.
+:::
+
+

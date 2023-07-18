@@ -1,0 +1,26 @@
+---
+title: "Animals"
+format: html
+---
+
+:::{.definition}
+**Elephant**
+
+The largest living land mammals.
+:::
+
+Fusce id velit ut tortor. Netus et malesuada fames ac turpis egestas maecenas. A cras semper auctor neque vitae tempus. Odio aenean sed adipiscing diam donec adipiscing tristique risus nec. Scelerisque varius morbi enim nunc faucibus a pellentesque sit. Nascetur ridiculus mus mauris vitae ultricies. 
+
+:::{.definition}
+**Hummingbird**
+
+The smallest of birds.
+:::
+
+Lacus sed turpis tincidunt id aliquet risus feugiat in. Quam adipiscing vitae proin sagittis. Massa eget egestas purus viverra accumsan in nisl nisi. Viverra mauris in aliquam sem fringilla ut morbi tincidunt augue.
+
+:::{.callout-note}
+## Note
+
+This block won't appear in the glossary because it lacks the `.def` class.
+:::
