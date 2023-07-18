@@ -5,9 +5,11 @@ quarto.log.output("=== Glossary Log ===")
 -- Core Functions --
 --================--
 
-local options_class = "def"
+local options_contents = "glossary-default"
+local options_class = "definition"
 local options_contents = nil
 
+-- Read in YAML options
 local function read_meta(meta)
   -- permitted options include:
   -- glossary:
@@ -19,14 +21,14 @@ local function read_meta(meta)
 
   local options = meta["glossary"]
   
-  -- read class
-  if options.class ~= nil then
-      options_class = options.class[1].text
-  end
-  
   -- read id
   if options.id ~= nil then
       options_id = options.id[1].text
+  end
+  
+  -- read class
+  if options.class ~= nil then
+      options_class = options.class[1].text
   end
   
   -- read contents and return list of files to scan for blocks
@@ -67,6 +69,7 @@ end
 
 
 
+-- Insert glossary contents into the appropriate Div block
 function insert_glossary(div)
   
   local filtered_blocks = {}
