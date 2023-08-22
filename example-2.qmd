@@ -1,5 +1,6 @@
 ---
-title: "Glossary Example"
+title: "Glossary Example 2"
+subtitle: "Two different glossaries on one page"
 format: html
 filters:
   - glossary
