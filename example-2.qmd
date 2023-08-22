@@ -1,0 +1,28 @@
+---
+title: "Glossary Example"
+format: html
+filters:
+  - glossary
+glossary:
+  - id: "my-defs"
+    class: "definition"
+    contents:
+      - "ex*"
+  - id: "my-fns"
+    class: "function"
+    contents:
+      - "ex*"
+---
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vestibulum morbi blandit cursus risus at ultrices mi tempus. Quam pellentesque nec nam aliquam. Tortor dignissim convallis aenean et tortor at risus viverra adipiscing. Est placerat in egestas erat imperdiet sed. Amet purus gravida quis blandit turpis cursus. Tortor posuere ac ut consequat semper. Nibh sed pulvinar proin gravida hendrerit. Mauris nunc congue nisi vitae. Nunc sed augue lacus viverra vitae congue eu.
+
+### Definitions
+
+:::{#my-defs}
+:::
+
+### Functions
+
+:::{#my-fns}
+:::
+
