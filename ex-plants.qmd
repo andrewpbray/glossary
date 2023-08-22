@@ -11,4 +11,10 @@ Tempus egestas sed sed risus pretium quam vulputate. Fermentum posuere urna nec 
 The largest trees on Earth, appearing in three species: Giant Sequoias, Coast Redwoods, and Dawn Redwoods.
 :::
 
+:::{.function}
+`rnorm()`
+
+Generates random draws from the standard Normal probability distribution.
+:::
+
 
