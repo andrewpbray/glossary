@@ -5,9 +5,7 @@ quarto.log.output("=== Glossary Log ===")
 -- Core Functions --
 --================--
 
-local options_contents = "glossary-default"
-local options_class = "definition"
-local options_contents = nil
+local glossary_meta = {}
 
 -- Read in YAML options
 local function read_meta(meta)
@@ -19,52 +17,47 @@ local function read_meta(meta)
   --     - "first-file.qmd"
   --     - "second-file.qmd"
 
-  local options = meta["glossary"]
+  glossary_meta = meta["glossary"]
   
-  -- read id
-  if options.id ~= nil then
-      options_id = options.id[1].text
-  end
+  for _,v in pairs(glossary_meta) do
   
-  -- read class
-  if options.class ~= nil then
-      options_class = options.class[1].text
-  end
-  
-  -- read contents and return list of files to scan for blocks
-  files_added = {}
-  files_to_scan = {}
-  if options.contents ~= nil then
-    for g = 1,#options.contents do
-      glob = options.contents[g][1].text
-      if string.sub(glob, 1, 1) ~= "!" then -- add these files
-        for f in io.popen("find . -type f \\( -name '*.qmd' -o -name '*.md' -o -name '*.ipynb' \\) -not \\( -path '*/.*' -o -path '*/_*' \\) -not \\( -name 'README.md' -o -name 'README.qmd' \\)"):lines() do
-          glob_match = string.match(f, globtopattern("./" .. glob))
-          if glob_match ~=nil and new_file(files_added, glob_match) then
-            files_added[#files_added + 1] = glob_match
+    -- read contents and return list of files to scan for blocks
+    local files_added = {}
+    local files_to_scan = {}
+    if v.contents ~= nil then
+      for g = 1,#v.contents do
+        local glob = v.contents[g][1].text
+        if string.sub(glob, 1, 1) ~= "!" then -- add these files
+          for f in io.popen("find . -type f \\( -name '*.qmd' -o -name '*.md' -o -name '*.ipynb' \\) -not \\( -path '*/.*' -o -path '*/_*' \\) -not \\( -name 'README.md' -o -name 'README.qmd' \\)"):lines() do
+            local glob_match = string.match(f, globtopattern("./" .. glob))
+            if glob_match ~=nil and new_file(files_added, glob_match) then
+              files_added[#files_added + 1] = glob_match
+            end
           end
-        end
-      else -- remove these files
-        ignored_glob = string.sub(glob, 2)
-        for i = 1,#files_added do
-          if (string.match(files_added[i], globtopattern("./" .. ignored_glob)) == nil) then
-            files_to_scan[#files_to_scan + 1] = files_added[i]
+        else -- remove these files
+          ignored_glob = string.sub(glob, 2)
+          for i = 1,#files_added do
+            if (string.match(files_added[i], globtopattern("./" .. ignored_glob)) == nil) then
+              files_to_scan[#files_to_scan + 1] = files_added[i]
+            end
           end
         end
       end
-    end
     
-    if #files_to_scan == 0 then
-      files_to_scan = files_added
-    end
+      if #files_to_scan == 0 then
+        files_to_scan = files_added
+      end
     
-  else
-    for f in io.popen("find . -type f \\( -name '*.qmd' -o -name '*.md' -o -name '*.ipynb' \\) -not \\( -path '*/.*' -o -path '*/_*' \\) -not \\( -name 'README.md' -o -name 'README.qmd' \\)"):lines() do
-      files_to_scan[#files_to_scan + 1] = f
+    else -- if no contents, scan through all files
+      for f in io.popen("find . -type f \\( -name '*.qmd' -o -name '*.md' -o -name '*.ipynb' \\) -not \\( -path '*/.*' -o -path '*/_*' \\) -not \\( -name 'README.md' -o -name 'README.qmd' \\)"):lines() do
+        files_to_scan[#files_to_scan + 1] = f
+      end
     end
+  
+    v.files_to_scan = files_to_scan
+  
   end
   
-  quarto.log.output("Files to be scanned: ", files_to_scan)
 end
 
 
@@ -72,21 +65,27 @@ end
 -- Insert glossary contents into the appropriate Div block
 function insert_glossary(div)
   
-  local filtered_blocks = {}
+  for _,v in pairs(glossary_meta) do -- for each id in glossary meta
+    local filtered_blocks = {}
   
-  -- find divs that match id
-  if (div.identifier == options_id) then
-    for _,filename in ipairs(files_to_scan) do -- read contents of files in glossary: contents
-      local file_contents = pandoc.read(io.open(filename):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
-      for _, block in ipairs(file_contents) do 
-        -- find blocks that meet conditions
-        if (block.classes ~= nil and block.t == "Div" and block.classes:includes(options_class)) then
-          table.insert(filtered_blocks, block)  -- Add the block to the filtered table
+    -- find divs that match id
+    if (div.identifier == v.id[1].text) then
+      quarto.log.output("> glossary id: ", v.id[1].text)
+      quarto.log.output(">> files scanned: ", v.files_to_scan)
+      for _,filename in ipairs(v.files_to_scan) do -- read contents of files
+        local file_contents = pandoc.read(io.open(filename):read "*a", "markdown", PANDOC_READER_OPTIONS).blocks
+        for _, block in ipairs(file_contents) do 
+          -- find blocks that meet conditions
+          if (block.classes ~= nil and block.t == "Div" and block.classes:includes(v.class[1].text)) then
+            table.insert(filtered_blocks, block)  -- Add the block to the filtered table
+          end
         end
       end
+      quarto.log.output(">> Number of blocks inserted: ", #filtered_blocks)
+      return filtered_blocks
     end
-    return filtered_blocks
   end
+  
 end
 
 
