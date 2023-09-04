@@ -52,10 +52,10 @@ The content that will fill in your new glossary block are specified in the docum
 filters:
   - glossary
 glossary:
-  id: my-glossary
-  class: definition
-  contents:
-    - "ex*"
+  - id: my-glossary
+    class: definition
+    contents:
+      - "ex*"
 ---
 ```
 
@@ -75,8 +75,16 @@ This specifies that the glossary with the id of `my-glossary` will contain any b
   - Lua has no built-in way to process globs, so this filter includes an [implementation](https://github.com/davidm/lua-glob-pattern) written by @davidm. [Globs in base Quarto](https://quarto.org/docs/reference/globs.html) are implemented in TypeScript, so the files matched by a glob in this filter may differ from the files matched by the same glob when, say, specifying the [contents for a listing](https://quarto.org/docs/websites/website-listings.html#listing-contents).
   
     If you run into issues using this glob syntax, it may be helpful to check the logs (appearing as a background job) to see the list of files matching the `contents` that will be scanned for blocks.
+    
+Each of the options should be specified, as in the example above, as an item in a yaml list (behind a `-`). This permits the inclusion of multiple glossaries within the same document (see `example-2.qmd`).
 
 ## Example
 
 See [example.qmd](example.qmd) for an example of a document that inserts a glossary of definitions from two other files: [ex-plants.qmd](ex-plants.qmd) and [ex-animals.qmd](ex-animals.qmd).
+
+## Compatibility
+
+This filter operates before any of the format-specific writer filters, so it should work for a wide range of output formats. It has been tested and shown to work on `html`, `pdf`, `revealjs`, and `docx`.
+
+In terms of system settings, this filter has been tested on MacOS and Ubuntu. It has not been tested on Windows and may fail on that OS due to the manner in which the lua filter scans the file system for matches to the glob. If that indeed is an issue, PRs welcome.
 
